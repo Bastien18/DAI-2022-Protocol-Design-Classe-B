@@ -9,7 +9,7 @@ This protocol needs to let a client ask for specific operation to the server. Th
 
 ## Message:
 
-- operande1, operande2, operator
+- inverted polish syntax
 - ask for solving a calculus
   gives the answer
   gives an error
@@ -18,4 +18,5 @@ This protocol needs to let a client ask for specific operation to the server. Th
 ## Specific element:
 - plus, minus, multiplication, division
 - divide by 0
+  lack of operand
 - modulo, roots, power
