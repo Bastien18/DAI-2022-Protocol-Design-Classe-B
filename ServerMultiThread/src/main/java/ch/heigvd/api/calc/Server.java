@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 public class Server {
 
     private final static Logger LOG = Logger.getLogger(Server.class.getName());
+    private final int PORT = 4400;
 
     /**
      * Main function to start the server
@@ -33,6 +34,25 @@ public class Server {
          *  For a new client connection, the actual work is done in a new thread
          *  by a new ServerWorker.
          */
+
+        ServerSocket serverSocket = null;
+        try{
+            // Create server socket
+            serverSocket = new ServerSocket(PORT);
+
+            // Waiting for new client to connect
+            while(true){
+                Socket clientSocket = serverSocket.accept();
+
+                // Create new threads to handle this client
+                ServerWorker worker = new ServerWorker(clientSocket);
+                Thread thread = new Thread(worker);
+                thread.start();
+            }
+        }
+        catch(Exception ex){
+            System.err.println("Something went wrong when creating the receptionist");
+        }
 
     }
 }

@@ -3,7 +3,7 @@ package ch.heigvd.api.calc;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -12,6 +12,9 @@ import java.util.logging.Logger;
 public class ServerWorker implements Runnable {
 
     private final static Logger LOG = Logger.getLogger(ServerWorker.class.getName());
+    private Socket clientSocket;
+    private BufferedReader in = null;
+    private BufferedWriter out = null;
 
     /**
      * Instantiation of a new worker mapped to a socket
@@ -26,6 +29,14 @@ public class ServerWorker implements Runnable {
          *   server calls the ServerWorker.run method.
          *   Don't call the ServerWorker.run method here. It has to be called from the Server.
          */
+
+        this.clientSocket = clientSocket;
+        try {
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -45,5 +56,21 @@ public class ServerWorker implements Runnable {
          *     - Send to result to the client
          */
 
+        String line;
+        ReversePolishCalculator calculator = new ReversePolishCalculator();
+
+        try {
+            while (!clientSocket.isClosed()) {
+
+                while( (line = in.readLine()) != null){
+                    if(line.equalsIgnoreCase(":q"))
+                        break;
+                    out.write(String.format("Resultat = %d\n", calculator.calculatorInvRev(line)));
+                }
+            }
+        }catch (Exception ex){
+            System.err.println("Something went wrong during the client-server communication");
+        }
     }
+
 }
